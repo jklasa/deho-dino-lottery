@@ -1,6 +1,7 @@
 import flask
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap
+from werkzeug import secure_filename
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -11,14 +12,18 @@ PORT = 8080
 
 @app.route("/")
 def gate():
-    return render_template("gate.html")
+    return render_template("upload.html")
 
-@app.route("/entry")
-def entry():
-    return render_template("entry.html")
-
-@app.route("/lotto")
+@app.route("/lotto", methods=['POST'])
 def lotto():
+    # Do some error checking
+    if ('pass' not in request.form or not request.form['pass']):
+        return render_template("error.html")
+
+    # Save the file
+    f = request.files['file']
+    f.save(secure_filename(f.filename))
+
     return render_template("lotto.html")
 
 if __name__ == "__main__":
