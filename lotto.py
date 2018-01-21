@@ -20,9 +20,13 @@ def lotto():
     if ('pass' not in request.form or not request.form['pass']):
         return render_template("error.html")
 
+    # Match the password
+    if request.form['pass'] != 'mississippi':
+        return render_template("error.html")
+
     # Save the file
     f = request.files['file']
-    f.save(secure_filename(f.filename))
+    f.save(secure_filename("entries.txt"))
 
     return render_template("lotto.html")
 
