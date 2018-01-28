@@ -5,7 +5,7 @@
 <script>
     var numEntries = 0;
     {% for entry in entries %}
-        $('#list').append('<li id="{{ loop.index }}">{{ entry }}</li>');
+        $('#list').append('<li id="' + numEntries + '">{{ entry }}</li>');
         numEntries++;
     {% endfor %}
 
@@ -20,22 +20,40 @@
 
     function setLayout() {
         $('#box').center();
-        $('#lotto-list').height($(window).height());
+        $('#lotto-list').height($(window).height() - $('#title').height());
+
+        var padding = $(window).height() / 2 + 100;
+        $('#list').css('padding', padding + 'px 0');
     }
 
     window.onload = setLayout;
     window.onresize = setLayout;
 
+    var prevPosition = 0;
     $(document).keypress(function(e) {
         if (e.which == 13) {
-            console.log("enter");
             var duration = Math.floor(Math.random() * 2000) + 1000;
             var entry = Math.floor(Math.random() * numEntries);
             var selection = $("#" + entry);
+            selection.css('color', 'white');
+
+            var selOffset = selection.position().top;
+            var selHeight = selection.height();
+            var windowHeight = $(window).height();
+            var position;
+
+            if (selHeight < windowHeight) {
+                position = selOffset - ((windowHeight / 2) - (selHeight / 2));
+            }
+            else {
+                position = selOffset;
+            }
 
             $('#lotto-list').animate({
-                scrollTop: selection.offset().top - $(window).height() / 2 - selection.height() / 2
+                scrollTop: prevPosition + position
             }, duration);
+
+            prevPosition += position
         }
     });
 </script>
@@ -43,10 +61,13 @@
 
 {% block content %}
 <div class="container">
-    <div id="box"></div>
-    <div id="lotto-list" class="center">
-        <ul id="list">
-        </ul>
+    <div id="sel">
+        <h1 id="title">T-Rex T-Shirt Tumble</h1>
+        <div id="box"></div>
+        <div id="lotto-list" class="center">
+            <ul id="list">
+            </ul>
+        </div>
     </div>
 </div>
 {% endblock content %}
