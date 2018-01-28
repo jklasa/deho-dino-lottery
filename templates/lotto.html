@@ -24,18 +24,57 @@
 
         var padding = $(window).height() / 2 + 100;
         $('#list').css('padding', padding + 'px 0');
+
+/*        $('#fade-top').appendTo('#lotto-list');
+        $('#fade-bottom').appendTo('#lotto-list');
+
+        var dest = $('#lotto-list').offset();
+        $('#fade-top').offset(dest);
+
+        var height = $('#lotto-list').height();
+        dest.top += height;
+        dest.top -= $('fade-bottom').height();
+        $('#fade-bottom').offset(dest);
+
+        var helper = $('<div />');
+        $('#lotto-list').append(helper);
+        $('#fade-top').width(helper.width());
+        $('#fade-bottom').width(helper.width());
+        helper.remove();*/
     }
 
     window.onload = setLayout;
     window.onresize = setLayout;
 
     var prevPosition = 0;
+    var prevEntry = 0;
+    var prevSel = null;
+    var prevEntries = [];
     $(document).keypress(function(e) {
         if (e.which == 13) {
-            var duration = Math.floor(Math.random() * 2000) + 1000;
-            var entry = Math.floor(Math.random() * numEntries);
+            if (prevSel != null) {
+                prevSel.css('color', 'brown');
+                prevSel.css('text-decoration', 'line-through');
+            }
+
+            var entry = prevEntry;
+            while (true) {
+                entry = Math.floor(Math.random() * numEntries);
+                
+                var dupFound = false;
+                for (var i = 0; i < prevEntries.length; i++ ) {
+                    if (prevEntries[i] == entry) {
+                        dupFound = true;
+                    }
+                }
+
+                if (!dupFound) {
+                    break;
+                }
+            }
+
+            var duration = Math.floor(Math.random() * 2000) + Math.abs(prevEntry - entry) * 50;
             var selection = $("#" + entry);
-            selection.css('color', 'white');
 
             var selOffset = selection.position().top;
             var selHeight = selection.height();
@@ -49,17 +88,31 @@
                 position = selOffset;
             }
 
-            $('#lotto-list').animate({
+            $('#lotto-list').animate(
+            {
                 scrollTop: prevPosition + position
-            }, duration);
+            }, 
+            {
+                duration: duration,
+                queue: false,
+                complete: function() {
+                    selection.css('color', 'white');
+                }
+            });
 
-            prevPosition += position
+            prevPosition += position;
+            prevEntry = entry;
+            prevSel = selection;
+            prevEntries.push(entry);
         }
     });
+
 </script>
 {% endblock scripts %}
 
 {% block content %}
+<div id="fade-top" class="scroll-fade scroll-fade-top"></div>
+<div id="fade-bottom" class="scroll-fade scroll-fade-bottom"></div>
 <div class="container">
     <div id="sel">
         <h1 id="title">T-Rex T-Shirt Tumble</h1>
