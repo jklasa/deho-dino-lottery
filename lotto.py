@@ -28,7 +28,12 @@ def lotto():
     f = request.files['file']
     f.save(secure_filename("entries.txt"))
 
-    return render_template("lotto.html")
+    # Read in the array
+    entries = []
+    for entry in open("entries.txt"):
+        entries.append(entry.rstrip())
+
+    return render_template("lotto.html", entries=entries)
 
 if __name__ == "__main__":
     #app.run(host='0.0.0.0', debug=False, threaded=True, port=PORT)
